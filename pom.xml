@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.jneagle</groupId>
-    <artifactId>jneagle-xlstool-djxhtj</artifactId>
+    <artifactId>jneagle-xlstool-dpxhtj</artifactId>
     <version>1.0.0.a-SNAPSHOT</version>
 
-    <name>jneagle-xlstool-djxhtj</name>
+    <name>jneagle-xlstool-dpxhtj</name>
     <url>http://maven.apache.org</url>
 
     <properties>

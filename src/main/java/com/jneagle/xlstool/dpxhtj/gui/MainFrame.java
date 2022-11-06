@@ -1,4 +1,4 @@
-package com.jneagle.xlstool.djxhtj.gui;
+package com.jneagle.xlstool.dpxhtj.gui;
 
 import com.dwarfeng.springterminator.stack.handler.Terminator;
 import org.springframework.context.annotation.DependsOn;
@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
     @PostConstruct
     public void postConstruct() {
         // 初始化窗口。
-        setTitle("刀具消耗统计");
+        setTitle("刀片消耗统计");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setBounds(100, 100, 600, 750);
         addWindowListener(new WindowClosingListener());
