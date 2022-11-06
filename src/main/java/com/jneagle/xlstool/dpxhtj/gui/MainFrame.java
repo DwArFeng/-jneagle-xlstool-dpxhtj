@@ -1,6 +1,7 @@
 package com.jneagle.xlstool.dpxhtj.gui;
 
 import com.dwarfeng.dutil.basic.cna.model.ReferenceModel;
+import com.dwarfeng.dutil.basic.gui.swing.SwingUtil;
 import com.dwarfeng.springterminator.stack.handler.Terminator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
@@ -65,11 +66,11 @@ public class MainFrame extends JFrame {
         // 在 contentPanel 的南方位置添加 statusPanel。
         contentPanel.add(statusPanel, BorderLayout.SOUTH);
 
-        // 启动界面
-        setVisible(true);
-
         // 显示就绪
         notificationModel.set("就绪...");
+
+        // 启动界面
+        SwingUtil.invokeInEventQueue(() -> setVisible(true));
     }
 
     private class WindowClosingListener extends WindowAdapter {

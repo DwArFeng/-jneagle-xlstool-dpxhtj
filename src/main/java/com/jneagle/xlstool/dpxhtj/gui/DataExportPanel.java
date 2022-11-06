@@ -22,7 +22,7 @@ public class DataExportPanel extends JPanel {
     private final JTextField exportFileTextField = new JTextField();
     private final JButton selectFileButton = new JButton();
     private final JPasswordField passwordField = new JPasswordField();
-    private final JButton statisticsAndSaveFileButton = new JButton();
+    private final JButton statisticsAndExportFileButton = new JButton();
     private final JTextField resultTextField = new JTextField();
     private final JButton showErrorButton = new JButton();
 
@@ -41,22 +41,22 @@ public class DataExportPanel extends JPanel {
         setLayout(gridBagLayout);
 
         // 导出文件标签。
-        JLabel loadFileLabel = new JLabel("导出文件");
-        GridBagConstraints gbcLoadFileLabel = new GridBagConstraints();
-        gbcLoadFileLabel.insets = new Insets(0, 0, 0, 5);
-        gbcLoadFileLabel.anchor = GridBagConstraints.EAST;
-        gbcLoadFileLabel.gridx = 0;
-        gbcLoadFileLabel.gridy = 0;
-        add(loadFileLabel, gbcLoadFileLabel);
+        JLabel importFileLabel = new JLabel("导出文件");
+        GridBagConstraints gbcImportFileLabel = new GridBagConstraints();
+        gbcImportFileLabel.insets = new Insets(0, 0, 0, 5);
+        gbcImportFileLabel.anchor = GridBagConstraints.EAST;
+        gbcImportFileLabel.gridx = 0;
+        gbcImportFileLabel.gridy = 0;
+        add(importFileLabel, gbcImportFileLabel);
 
         // 文件路径文本框。
         exportFileTextField.setEditable(false);
-        GridBagConstraints gbcLoadFileTextField = new GridBagConstraints();
-        gbcLoadFileTextField.insets = new Insets(0, 0, 0, 5);
-        gbcLoadFileTextField.fill = GridBagConstraints.BOTH;
-        gbcLoadFileTextField.gridx = 1;
-        gbcLoadFileTextField.gridy = 0;
-        add(exportFileTextField, gbcLoadFileTextField);
+        GridBagConstraints gbcImportFileTextField = new GridBagConstraints();
+        gbcImportFileTextField.insets = new Insets(0, 0, 0, 5);
+        gbcImportFileTextField.fill = GridBagConstraints.BOTH;
+        gbcImportFileTextField.gridx = 1;
+        gbcImportFileTextField.gridy = 0;
+        add(exportFileTextField, gbcImportFileTextField);
 
         // 选择文件按钮。
 //        selectFileButton.setAction(new SelectFileAction()); TODO
@@ -87,14 +87,14 @@ public class DataExportPanel extends JPanel {
         add(passwordField, gbcPasswordField);
 
         // 统计并导出文件按钮。
-//        statisticsAndSaveFileButton.setAction(new LoadFileAction()); TODO
-        statisticsAndSaveFileButton.setText("统计并导出");
-        GridBagConstraints gbcLoadFileButton = new GridBagConstraints();
-        gbcLoadFileButton.insets = new Insets(0, 0, 0, 0);
-        gbcLoadFileButton.fill = GridBagConstraints.BOTH;
-        gbcLoadFileButton.gridx = 2;
-        gbcLoadFileButton.gridy = 1;
-        add(statisticsAndSaveFileButton, gbcLoadFileButton);
+//        statisticsAndExportFileButton.setAction(new ImportFileAction()); TODO
+        statisticsAndExportFileButton.setText("统计并导出");
+        GridBagConstraints gbcImportFileButton = new GridBagConstraints();
+        gbcImportFileButton.insets = new Insets(0, 0, 0, 0);
+        gbcImportFileButton.fill = GridBagConstraints.BOTH;
+        gbcImportFileButton.gridx = 2;
+        gbcImportFileButton.gridy = 1;
+        add(statisticsAndExportFileButton, gbcImportFileButton);
 
         // 结果标签。
         JLabel resultLabel = new JLabel("结果");
@@ -125,7 +125,7 @@ public class DataExportPanel extends JPanel {
         add(showErrorButton, gbcShowErrorButton);
 
         // 添加侦听器。 TODO
-//        structuredFileModel.addObserver(loadFileObserver);
+//        structuredFileModel.addObserver(importFileObserver);
 //        structuredPasswordModel.addObserver(passwordObserver);
 //        structuredDataTableModel.addTableModelListener(structuredDataTableModelListener);
 //        structuredErrorInfoTableModel.addTableModelListener(structuredErrorInfoTableModelListener);
