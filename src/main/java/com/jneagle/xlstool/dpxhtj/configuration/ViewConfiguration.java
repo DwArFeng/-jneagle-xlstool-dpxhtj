@@ -1,7 +1,11 @@
 package com.jneagle.xlstool.dpxhtj.configuration;
 
+import com.dwarfeng.dutil.basic.cna.model.DefaultReferenceModel;
+import com.dwarfeng.dutil.basic.cna.model.ReferenceModel;
+import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -20,5 +24,15 @@ public class ViewConfiguration {
         } catch (UnsupportedLookAndFeelException e) {
             LOGGER.warn("系统不支持 NimbusLookAndFeel 主题，将使用默认主题", e);
         }
+    }
+
+    @Bean
+    public ReferenceModel<String> notificationModel() {
+        return new DefaultReferenceModel<>();
+    }
+
+    @Bean
+    public ReferenceModel<ProgressStatus> progressStatusModel() {
+        return new DefaultReferenceModel<>(ProgressStatus.IDLE);
     }
 }

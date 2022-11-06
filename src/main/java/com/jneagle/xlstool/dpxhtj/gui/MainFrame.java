@@ -1,6 +1,8 @@
 package com.jneagle.xlstool.dpxhtj.gui;
 
+import com.dwarfeng.dutil.basic.cna.model.ReferenceModel;
 import com.dwarfeng.springterminator.stack.handler.Terminator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +23,26 @@ import java.awt.event.WindowEvent;
 @DependsOn("viewConfiguration")
 public class MainFrame extends JFrame {
 
+    private static final long serialVersionUID = 743769340495353537L;
+
     private final Terminator terminator;
 
-    public MainFrame(Terminator terminator) {
+    private final ReferenceModel<String> notificationModel;
+
+    private final BodyGridBagPane bodyGridBagPane;
+    private final StatusPanel statusPanel;
+
+
+    public MainFrame(
+            Terminator terminator,
+            @Qualifier("notificationModel") ReferenceModel<String> notificationModel,
+            BodyGridBagPane bodyGridBagPane,
+            StatusPanel statusPanel
+    ) {
         this.terminator = terminator;
+        this.notificationModel = notificationModel;
+        this.bodyGridBagPane = bodyGridBagPane;
+        this.statusPanel = statusPanel;
     }
 
     @PostConstruct
@@ -34,17 +52,24 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setBounds(100, 100, 600, 750);
         addWindowListener(new WindowClosingListener());
+
         // 初始化 contentPanel。
         JPanel contentPanel = new JPanel();
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPanel);
         contentPanel.setLayout(new BorderLayout(0, 0));
-        // 初始化 bodyPanel。
-        // contentPanel.add(bodyTabbedPane, BorderLayout.CENTER);
-        // 初始化 statusPanel。
-        // contentPanel.add(statusPanel, BorderLayout.SOUTH);
+
+        // 在 contentPanel 的中心位置添加 bodyGridBagPane。
+        contentPanel.add(bodyGridBagPane, BorderLayout.CENTER);
+
+        // 在 contentPanel 的南方位置添加 statusPanel。
+        contentPanel.add(statusPanel, BorderLayout.SOUTH);
+
         // 启动界面
         setVisible(true);
+
+        // 显示就绪
+        notificationModel.set("就绪...");
     }
 
     private class WindowClosingListener extends WindowAdapter {
