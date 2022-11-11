@@ -289,7 +289,7 @@ public class DataImportPanel extends JPanel {
                 }
             } catch (Exception ex) {
                 LOGGER.warn("选择文件时发生异常，异常信息如下: ", ex);
-                notificationHandler.error(DataImportPanel.this, "选择文件时发出异常，详见日志");
+                notificationHandler.error(SwingUtilities.getRoot(DataImportPanel.this), "选择文件时发出异常，详见日志");
             }
         }
     }
@@ -372,18 +372,12 @@ public class DataImportPanel extends JPanel {
                     // 分析异常。
                     int code = ex.getCode().getCode();
                     if (Objects.equals(code, ServiceExceptionCodes.WRONG_PASSWORD.getCode())) {
-                        notificationHandler.warn(DataImportPanel.this, "密码错误");
+                        notificationHandler.warn(SwingUtilities.getRoot(DataImportPanel.this), "密码错误");
                     } else {
-                        LOGGER.warn("程序读取数据时发生异常, 异常信息如下:", ex);
-                        notificationHandler.warn(DataImportPanel.this, "程序内部错误，请联系开发人员");
+                        notificationHandler.warn(
+                                SwingUtilities.getRoot(DataImportPanel.this), "程序内部错误，请联系开发人员"
+                        );
                     }
-                    // 更新通知面板标签文本。
-                    notificationModel.set("数据导入失败");
-                    return;
-                } catch (Exception ex) {
-                    // 记录日志并通知用户。
-                    LOGGER.warn("程序读取数据时发生异常, 异常信息如下:", ex);
-                    notificationHandler.warn(DataImportPanel.this, "程序内部错误，请联系开发人员");
                     // 更新通知面板标签文本。
                     notificationModel.set("数据导入失败");
                     return;
@@ -403,7 +397,7 @@ public class DataImportPanel extends JPanel {
 //                }
             } catch (Exception ex) {
                 LOGGER.warn("加载文件时发生异常，异常信息如下: ", ex);
-                notificationHandler.error(DataImportPanel.this, "ui.label.011");
+                notificationHandler.error(SwingUtilities.getRoot(DataImportPanel.this), "ui.label.011");
             }
         }
     }
