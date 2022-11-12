@@ -11,7 +11,7 @@
 
     <!-- 设置配置文件的路径 -->
     <context:property-placeholder
-            location="classpath:xlstool/*.properties,classpath:structured-data/*.properties,
+            location="classpath:xlstool/*.properties,classpath:data-import/*.properties,
             classpath:raw-data/*.properties,classpath:export-data/*.properties"
             local-override="true"
             properties-ref="refProperties"
@@ -24,7 +24,7 @@
                 <!--suppress SpringXmlModelInspection -->
                 <value>file:conf/xlstool/*.properties</value>
                 <!--suppress SpringXmlModelInspection -->
-                <value>file:conf/structured-data/*.properties</value>
+                <value>file:conf/data-import/*.properties</value>
                 <!--suppress SpringXmlModelInspection -->
                 <value>file:conf/raw-data/*.properties</value>
                 <!--suppress SpringXmlModelInspection -->

@@ -11,19 +11,19 @@ import com.dwarfeng.subgrade.stack.bean.key.UuidKey;
  */
 public class ImportErrorInfo implements Entity<UuidKey> {
 
-    private static final long serialVersionUID = 7112418416083577797L;
+    private static final long serialVersionUID = -3798767439401160407L;
 
     private UuidKey key;
-    private Integer sheetIndex;
+    private String sheetName;
     private Integer rowIndex;
     private String errorMessage;
 
     public ImportErrorInfo() {
     }
 
-    public ImportErrorInfo(UuidKey key, Integer sheetIndex, Integer rowIndex, String errorMessage) {
+    public ImportErrorInfo(UuidKey key, String sheetName, Integer rowIndex, String errorMessage) {
         this.key = key;
-        this.sheetIndex = sheetIndex;
+        this.sheetName = sheetName;
         this.rowIndex = rowIndex;
         this.errorMessage = errorMessage;
     }
@@ -38,12 +38,12 @@ public class ImportErrorInfo implements Entity<UuidKey> {
         this.key = key;
     }
 
-    public Integer getSheetIndex() {
-        return sheetIndex;
+    public String getSheetName() {
+        return sheetName;
     }
 
-    public void setSheetIndex(Integer sheetIndex) {
-        this.sheetIndex = sheetIndex;
+    public void setSheetName(String sheetName) {
+        this.sheetName = sheetName;
     }
 
     public Integer getRowIndex() {
@@ -66,7 +66,7 @@ public class ImportErrorInfo implements Entity<UuidKey> {
     public String toString() {
         return "ImportErrorInfo{" +
                 "key=" + key +
-                ", sheetIndex=" + sheetIndex +
+                ", sheetName=" + sheetName +
                 ", rowIndex=" + rowIndex +
                 ", errorMessage='" + errorMessage + '\'' +
                 '}';
