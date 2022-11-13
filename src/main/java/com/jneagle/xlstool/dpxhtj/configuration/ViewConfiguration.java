@@ -5,6 +5,7 @@ import com.dwarfeng.dutil.basic.cna.model.ReferenceModel;
 import com.dwarfeng.dutil.basic.gui.swing.MappingTableModel;
 import com.dwarfeng.dutil.basic.gui.swing.MappingTableModel.MappingInfos;
 import com.jneagle.xlstool.dpxhtj.bean.entity.ConsumingDetail;
+import com.jneagle.xlstool.dpxhtj.bean.entity.ExportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.bean.entity.ImportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.handler.ModalHandler;
 import com.jneagle.xlstool.dpxhtj.structure.ModalItem;
@@ -56,7 +57,32 @@ public class ViewConfiguration {
     }
 
     @Bean
+    public ReferenceModel<File> exportFileModel(ModalHandler modalHandler) {
+        boolean loadFlag = modalHandler.getValue(ModalItem.MODAL_DATA_EXPORT_LAST_EXPORT_FLAG, Boolean.class);
+        File file = modalHandler.getValue(ModalItem.MODAL_DATA_EXPORT_LAST_EXPORT_FILE, File.class);
+        if (!loadFlag) {
+            file = null;
+        }
+        return new DefaultReferenceModel<>(file);
+    }
+
+    @Bean
+    public ReferenceModel<Integer> exportFileTypeModel(ModalHandler modalHandler) {
+        boolean loadFlag = modalHandler.getValue(ModalItem.MODAL_DATA_EXPORT_LAST_EXPORT_FLAG, Boolean.class);
+        Integer type = modalHandler.getValue(ModalItem.MODAL_DATA_EXPORT_LAST_EXPORT_FILE_TYPE, Integer.class);
+        if (!loadFlag) {
+            type = null;
+        }
+        return new DefaultReferenceModel<>(type);
+    }
+
+    @Bean
     public ReferenceModel<String> importPasswordModel() {
+        return new DefaultReferenceModel<>();
+    }
+
+    @Bean
+    public ReferenceModel<String> exportPasswordModel() {
         return new DefaultReferenceModel<>();
     }
 
@@ -104,5 +130,22 @@ public class ViewConfiguration {
             columnName = "错误信息", columnValueGetterName = "getErrorMessage", columnClass = String.class
     )
     private interface ImportErrorInfoMappingInfo extends MappingInfos {
+    }
+
+    @Bean
+    public MappingTableModel<ExportErrorInfo> exportErrorInfoTableModel() {
+        return new MappingTableModel<>(ExportErrorInfo.class, ExportErrorInfoMappingInfo.class);
+    }
+
+    @MappingTableModel.TableColumn(
+            columnName = "工作簿名", columnValueGetterName = "getSheetName", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "行索引", columnValueGetterName = "getRowIndex", columnClass = Integer.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "错误信息", columnValueGetterName = "getErrorMessage", columnClass = String.class
+    )
+    private interface ExportErrorInfoMappingInfo extends MappingInfos {
     }
 }

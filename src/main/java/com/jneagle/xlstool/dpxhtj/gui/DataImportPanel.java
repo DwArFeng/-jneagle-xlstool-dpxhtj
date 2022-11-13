@@ -125,8 +125,8 @@ public class DataImportPanel extends JPanel {
         gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0};
         setLayout(gridBagLayout);
 
-        // 加载文件标签。
-        JLabel importFileLabel = new JLabel("加载文件");
+        // 导入文件标签。
+        JLabel importFileLabel = new JLabel("导入文件");
         GridBagConstraints gbcImportFileLabel = new GridBagConstraints();
         gbcImportFileLabel.insets = new Insets(0, 0, 0, 5);
         gbcImportFileLabel.anchor = GridBagConstraints.EAST;
@@ -173,7 +173,7 @@ public class DataImportPanel extends JPanel {
 
         // 读取文件按钮。
         importFileButton.setAction(importFileAction);
-        importFileButton.setText("加载");
+        importFileButton.setText("导入");
         GridBagConstraints gbcImportFileButton = new GridBagConstraints();
         gbcImportFileButton.insets = new Insets(0, 0, 0, 0);
         gbcImportFileButton.fill = GridBagConstraints.BOTH;
@@ -401,13 +401,13 @@ public class DataImportPanel extends JPanel {
 
                 // 判断是否存在数据错误，如果有错误，则需要自动弹出错误对话框。
                 if (importErrorInfoTableModel.isEmpty()) {
-                    notificationModel.set("消耗详细信息导入成功");
+                    notificationModel.set("信息导入成功");
                 } else {
-                    notificationModel.set("消耗详细信息导入完成，但存在错误");
+                    notificationModel.set("信息导入完成，但存在错误");
                 }
             } catch (Exception ex) {
-                LOGGER.warn("加载文件时发生异常，异常信息如下: ", ex);
-                notificationHandler.error(SwingUtilities.getRoot(DataImportPanel.this), "ui.label.011");
+                LOGGER.warn("导入文件时发生异常，异常信息如下: ", ex);
+                notificationHandler.error(SwingUtilities.getRoot(DataImportPanel.this), "导入文件时发出异常，详见日志");
             }
         }
     }
