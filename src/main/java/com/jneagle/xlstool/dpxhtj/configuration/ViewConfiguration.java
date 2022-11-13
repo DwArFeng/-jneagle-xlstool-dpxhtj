@@ -2,6 +2,10 @@ package com.jneagle.xlstool.dpxhtj.configuration;
 
 import com.dwarfeng.dutil.basic.cna.model.DefaultReferenceModel;
 import com.dwarfeng.dutil.basic.cna.model.ReferenceModel;
+import com.dwarfeng.dutil.basic.gui.swing.MappingTableModel;
+import com.dwarfeng.dutil.basic.gui.swing.MappingTableModel.MappingInfos;
+import com.jneagle.xlstool.dpxhtj.bean.entity.ConsumingDetail;
+import com.jneagle.xlstool.dpxhtj.bean.entity.ImportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.handler.ModalHandler;
 import com.jneagle.xlstool.dpxhtj.structure.ModalItem;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
@@ -14,6 +18,8 @@ import javax.annotation.PostConstruct;
 import javax.swing.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.io.File;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Configuration
 public class ViewConfiguration {
@@ -52,5 +58,51 @@ public class ViewConfiguration {
     @Bean
     public ReferenceModel<String> importPasswordModel() {
         return new DefaultReferenceModel<>();
+    }
+
+    @Bean
+    public MappingTableModel<ConsumingDetail> consumingDetailTableModel() {
+        return new MappingTableModel<>(ConsumingDetail.class, ConsumingDetailMappingInfo.class);
+    }
+
+    @MappingTableModel.TableColumn(
+            columnName = "刀片型号", columnValueGetterName = "getToolCutterType", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "设备", columnValueGetterName = "getDevice", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "消耗数量", columnValueGetterName = "getConsumingQuantity", columnClass = Integer.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "价值", columnValueGetterName = "getWorth", columnClass = BigDecimal.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "领用人", columnValueGetterName = "getConsumingPerson", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "领用日期", columnValueGetterName = "getConsumingDate", columnClass = Date.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "备注", columnValueGetterName = "getRemark", columnClass = String.class
+    )
+    private interface ConsumingDetailMappingInfo extends MappingInfos {
+    }
+
+    @Bean
+    public MappingTableModel<ImportErrorInfo> importErrorInfoTableModel() {
+        return new MappingTableModel<>(ImportErrorInfo.class, ImportErrorInfoMappingInfo.class);
+    }
+
+    @MappingTableModel.TableColumn(
+            columnName = "工作簿名", columnValueGetterName = "getSheetName", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "行索引", columnValueGetterName = "getRowIndex", columnClass = Integer.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "错误信息", columnValueGetterName = "getErrorMessage", columnClass = String.class
+    )
+    private interface ImportErrorInfoMappingInfo extends MappingInfos {
     }
 }

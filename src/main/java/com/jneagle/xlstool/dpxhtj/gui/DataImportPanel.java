@@ -2,11 +2,16 @@ package com.jneagle.xlstool.dpxhtj.gui;
 
 import com.dwarfeng.dutil.basic.cna.model.ReferenceModel;
 import com.dwarfeng.dutil.basic.cna.model.obs.ReferenceAdapter;
+import com.dwarfeng.dutil.basic.gui.swing.MappingTableModel;
 import com.dwarfeng.dutil.basic.gui.swing.SwingUtil;
 import com.dwarfeng.subgrade.stack.exception.ServiceException;
+import com.jneagle.xlstool.dpxhtj.bean.entity.ConsumingDetail;
+import com.jneagle.xlstool.dpxhtj.bean.entity.ImportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.handler.ModalHandler;
 import com.jneagle.xlstool.dpxhtj.handler.NotificationHandler;
+import com.jneagle.xlstool.dpxhtj.service.ConsumingDetailMaintainService;
 import com.jneagle.xlstool.dpxhtj.service.DataImportService;
+import com.jneagle.xlstool.dpxhtj.service.ImportErrorInfoMaintainService;
 import com.jneagle.xlstool.dpxhtj.structure.ModalItem;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressObserver;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
@@ -23,6 +28,8 @@ import javax.annotation.PreDestroy;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -40,10 +47,12 @@ import java.util.Optional;
 @DependsOn("viewConfiguration")
 public class DataImportPanel extends JPanel {
 
-    private static final long serialVersionUID = -4360901850413337420L;
+    private static final long serialVersionUID = -1521715549303446921L;
     private static final Logger LOGGER = LoggerFactory.getLogger(DataImportPanel.class);
 
     private final DataImportService dataImportService;
+    private final ConsumingDetailMaintainService consumingDetailMaintainService;
+    private final ImportErrorInfoMaintainService importErrorInfoMaintainService;
 
     private final NotificationHandler notificationHandler;
     private final ModalHandler modalHandler;
@@ -54,6 +63,10 @@ public class DataImportPanel extends JPanel {
     private final ReferenceModel<String> importPasswordModel;
     private final ReferenceModel<String> notificationModel;
     private final ReferenceModel<ProgressStatus> progressStatusModel;
+    private final MappingTableModel<ConsumingDetail> consumingDetailTableModel;
+    private final MappingTableModel<ImportErrorInfo> importErrorInfoTableModel;
+
+    private final DataImportErrorDialog dataImportErrorDialog;
 
     private final JTextField importFileTextField = new JTextField();
     private final JButton selectFileButton = new JButton();
@@ -68,18 +81,27 @@ public class DataImportPanel extends JPanel {
     private final ImportPasswordDocumentListener importPasswordDocumentListener = new ImportPasswordDocumentListener();
     private final ImportFileAction importFileAction = new ImportFileAction();
     private final DataImportProgressObserver dataImportProgressObserver = new DataImportProgressObserver();
+    private final DataImportTableModelListener dataImportTableModelListener = new DataImportTableModelListener();
+    private final ShowErrorDialogAction showErrorDialogAction = new ShowErrorDialogAction();
 
     public DataImportPanel(
             DataImportService dataImportService,
+            ConsumingDetailMaintainService consumingDetailMaintainService,
+            ImportErrorInfoMaintainService importErrorInfoMaintainService,
             NotificationHandler notificationHandler,
             ModalHandler modalHandler,
             ThreadPoolTaskExecutor executor,
             @Qualifier("importFileModel") ReferenceModel<File> importFileModel,
             @Qualifier("importPasswordModel") ReferenceModel<String> importPasswordModel,
             @Qualifier("notificationModel") ReferenceModel<String> notificationModel,
-            @Qualifier("progressStatusModel") ReferenceModel<ProgressStatus> progressStatusModel
+            @Qualifier("progressStatusModel") ReferenceModel<ProgressStatus> progressStatusModel,
+            @Qualifier("consumingDetailTableModel") MappingTableModel<ConsumingDetail> consumingDetailTableModel,
+            @Qualifier("importErrorInfoTableModel") MappingTableModel<ImportErrorInfo> importErrorInfoTableModel,
+            DataImportErrorDialog dataImportErrorDialog
     ) {
         this.dataImportService = dataImportService;
+        this.consumingDetailMaintainService = consumingDetailMaintainService;
+        this.importErrorInfoMaintainService = importErrorInfoMaintainService;
         this.notificationHandler = notificationHandler;
         this.modalHandler = modalHandler;
         this.executor = executor;
@@ -87,6 +109,9 @@ public class DataImportPanel extends JPanel {
         this.importPasswordModel = importPasswordModel;
         this.notificationModel = notificationModel;
         this.progressStatusModel = progressStatusModel;
+        this.consumingDetailTableModel = consumingDetailTableModel;
+        this.importErrorInfoTableModel = importErrorInfoTableModel;
+        this.dataImportErrorDialog = dataImportErrorDialog;
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -175,7 +200,7 @@ public class DataImportPanel extends JPanel {
         add(resultTextField, gbcResultTextField);
 
         // 显示错误按钮。
-//        showErrorButton.setAction(new ShowErrorDialogAction()); TODO
+        showErrorButton.setAction(showErrorDialogAction);
         showErrorButton.setText("显示错误...");
         GridBagConstraints gbcShowErrorButton = new GridBagConstraints();
         gbcShowErrorButton.insets = new Insets(0, 0, 0, 0);
@@ -184,13 +209,13 @@ public class DataImportPanel extends JPanel {
         gbcShowErrorButton.gridy = 2;
         add(showErrorButton, gbcShowErrorButton);
 
-        // 添加侦听器。 TODO
+        // 添加侦听器。
         importFileModel.addObserver(importFileObserver);
         importPasswordModel.addObserver(importPasswordObserver);
-//        structuredDataTableModel.addTableModelListener(structuredDataTableModelListener);
-//        structuredErrorInfoTableModel.addTableModelListener(structuredErrorInfoTableModelListener);
+        consumingDetailTableModel.addTableModelListener(dataImportTableModelListener);
+        importErrorInfoTableModel.addTableModelListener(dataImportTableModelListener);
 
-        // 同步属性。 TODO
+        // 同步属性。
         syncProperties();
     }
 
@@ -205,38 +230,20 @@ public class DataImportPanel extends JPanel {
             } else {
                 importFileButton.setEnabled(file.exists());
             }
-//            resultTextField.setText(i18nHandler.getMessage(
-//                    "ui.label.019",
-//                    new Object[]{structuredDataTableModel.size(), structuredErrorInfoTableModel.size()}
-//            ));
-//            showErrorButton.setEnabled(!structuredErrorInfoTableModel.isEmpty());
+            resultTextField.setText(String.format(
+                    "%d 成功, %d 失败", consumingDetailTableModel.size(), importErrorInfoTableModel.size()
+            ));
+            showErrorButton.setEnabled(!importErrorInfoTableModel.isEmpty());
         });
     }
 
     @PreDestroy
     public void preDestroy() {
-        // 移除侦听器。 TODO
+        // 移除侦听器。
         importFileModel.removeObserver(importFileObserver);
         importPasswordModel.removeObserver(importPasswordObserver);
-//        structuredDataTableModel.removeTableModelListener(structuredDataTableModelListener);
-//        structuredErrorInfoTableModel.removeTableModelListener(structuredErrorInfoTableModelListener);
-    }
-
-    public void loadData() {
-        //TODO
-//        structuredDataTableModel.clear();
-//        structuredErrorInfoTableModel.clear();
-//        executor.submit(() -> {
-//            try {
-//                java.util.List<StructuredData> structuredDataList = structuredDataMaintainService.lookupAsList();
-//                List<StructuredErrorInfo> structuredErrorInfoList =
-//                        structuredErrorInfoMaintainService.lookupAsList();
-//                structuredDataTableModel.addAll(structuredDataList);
-//                structuredErrorInfoTableModel.addAll(structuredErrorInfoList);
-//            } catch (Exception e) {
-//                messageHandler.error(this, "ui.label.031");
-//            }
-//        });
+        consumingDetailTableModel.removeTableModelListener(dataImportTableModelListener);
+        importErrorInfoTableModel.removeTableModelListener(dataImportTableModelListener);
     }
 
     private class ImportFileObserver extends ReferenceAdapter<File> {
@@ -387,14 +394,17 @@ public class DataImportPanel extends JPanel {
                 }
 
                 // 重新加载结构化数据。
-                loadData();
+                consumingDetailTableModel.clear();
+                importErrorInfoTableModel.clear();
+                consumingDetailTableModel.addAll(consumingDetailMaintainService.lookupAsList());
+                importErrorInfoTableModel.addAll(importErrorInfoMaintainService.lookupAsList());
 
-//                // 判断是否存在数据错误，如果有错误，则需要自动弹出错误对话框。
-//                if (structuredErrorInfoTableModel.isEmpty()) {
-//                    notificationModel.set(i18nHandler.getMessage("ui.label.020"));
-//                } else {
-//                    notificationModel.set(i18nHandler.getMessage("ui.label.021"));
-//                }
+                // 判断是否存在数据错误，如果有错误，则需要自动弹出错误对话框。
+                if (importErrorInfoTableModel.isEmpty()) {
+                    notificationModel.set("消耗详细信息导入成功");
+                } else {
+                    notificationModel.set("消耗详细信息导入完成，但存在错误");
+                }
             } catch (Exception ex) {
                 LOGGER.warn("加载文件时发生异常，异常信息如下: ", ex);
                 notificationHandler.error(SwingUtilities.getRoot(DataImportPanel.this), "ui.label.011");
@@ -407,6 +417,30 @@ public class DataImportPanel extends JPanel {
         @Override
         public void onProgressChanged(ProgressStatus progressStatus) {
             progressStatusModel.set(progressStatus);
+        }
+    }
+
+    private class DataImportTableModelListener implements TableModelListener {
+
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            SwingUtil.invokeInEventQueue(() -> {
+                resultTextField.setText(String.format(
+                        "%d 成功, %d 失败", consumingDetailTableModel.size(), importErrorInfoTableModel.size()
+                ));
+                showErrorButton.setEnabled(!importErrorInfoTableModel.isEmpty());
+            });
+        }
+    }
+
+    private class ShowErrorDialogAction extends AbstractAction {
+
+        private static final long serialVersionUID = -3853442954699420875L;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dataImportErrorDialog.setLocationRelativeTo(SwingUtilities.getRoot(DataImportPanel.this));
+            dataImportErrorDialog.setVisible(true);
         }
     }
 }
