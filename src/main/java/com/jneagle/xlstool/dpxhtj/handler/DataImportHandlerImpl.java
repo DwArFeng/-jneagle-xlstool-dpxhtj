@@ -205,6 +205,4 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
             importErrorInfos.add(importErrorInfo);
         }
     }
-
-
 }

@@ -14,6 +14,8 @@ public final class ServiceExceptionCodes {
 
     public static final ServiceException.Code WRONG_PASSWORD =
             new ServiceException.Code(offset(0), "wrong password");
+    public static final ServiceException.Code TEMPLATE_LOAD_FAILED =
+            new ServiceException.Code(offset(10), "template load failed");
 
     @SuppressWarnings("SameParameterValue")
     private static int offset(int i) {
@@ -40,6 +42,7 @@ public final class ServiceExceptionCodes {
 
         // 以新的 EXCEPTION_CODE_OFFSET 为基准，更新异常代码的值。
         WRONG_PASSWORD.setCode(offset(0));
+        TEMPLATE_LOAD_FAILED.setCode(offset(10));
     }
 
     private ServiceExceptionCodes() {

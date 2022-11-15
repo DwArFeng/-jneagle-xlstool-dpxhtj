@@ -17,6 +17,7 @@ import com.jneagle.xlstool.dpxhtj.structure.ModalItem;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressObserver;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
 import com.jneagle.xlstool.dpxhtj.util.Constants;
+import com.jneagle.xlstool.dpxhtj.util.ServiceExceptionCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -320,9 +321,6 @@ public class DataExportPanel extends JPanel {
                         throw new IllegalStateException("不应该执行到此处, 请联系开发人员");
                     }
 
-                    LOGGER.info(type + "");
-                    LOGGER.info(file.getAbsolutePath());
-
                     exportFileModel.set(file);
                     exportFileTypeModel.set(type);
                 }
@@ -430,10 +428,16 @@ public class DataExportPanel extends JPanel {
                 try {
                     dataExportService.execExport(statisticResult, file, fileType, password);
                 } catch (ServiceException ex) {
+                    // 分析异常。
+                    int code = ex.getCode().getCode();
+                    if (Objects.equals(code, ServiceExceptionCodes.TEMPLATE_LOAD_FAILED.getCode())) {
+                        notificationHandler.warn(SwingUtilities.getRoot(DataExportPanel.this), "模板加载失败");
+                    } else {
+                        notificationHandler.warn(
+                                SwingUtilities.getRoot(DataExportPanel.this), "程序内部错误，请联系开发人员"
+                        );
+                    }
                     // 更新通知面板标签文本。
-                    notificationHandler.warn(
-                            SwingUtilities.getRoot(DataExportPanel.this), "程序内部错误，请联系开发人员"
-                    );
                     notificationModel.set("数据导出失败");
                     return;
                 } finally {

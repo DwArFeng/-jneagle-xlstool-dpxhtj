@@ -1,6 +1,5 @@
 package com.jneagle.xlstool.dpxhtj.handler;
 
-
 import com.jneagle.xlstool.dpxhtj.structure.ProgressObserver;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
 

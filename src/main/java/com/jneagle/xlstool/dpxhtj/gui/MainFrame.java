@@ -33,7 +33,6 @@ public class MainFrame extends JFrame {
     private final BodyGridBagPane bodyGridBagPane;
     private final StatusPanel statusPanel;
 
-
     public MainFrame(
             Terminator terminator,
             @Qualifier("notificationModel") ReferenceModel<String> notificationModel,
