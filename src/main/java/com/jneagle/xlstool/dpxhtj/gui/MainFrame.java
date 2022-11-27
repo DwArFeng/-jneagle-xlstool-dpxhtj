@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
         // 初始化窗口。
         setTitle("刀片消耗统计");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setBounds(100, 100, 600, 750);
+        setBounds(100, 100, 1024, 768);
         addWindowListener(new WindowClosingListener());
 
         // 初始化 contentPanel。
