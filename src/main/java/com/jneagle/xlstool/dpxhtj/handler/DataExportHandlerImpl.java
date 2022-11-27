@@ -53,8 +53,6 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
 
     @Value("${data_export.data_sheet.person_perspective.first_data_row}")
     private int personPerspectiveFirstDataRow;
-    @Value("${data_export.data_sheet.person_perspective.column_index.no}")
-    private int personPerspectiveNoColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.month}")
     private int personPerspectiveMonthColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.name}")
@@ -65,17 +63,19 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     private int personPerspectiveConsumingQuantityColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.worth}")
     private int personPerspectiveWorthColumnIndex;
+    @Value("${data_export.data_sheet.person_perspective.column_index.returning_quantity}")
+    private int personPerspectiveReturningQuantityColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.device}")
     private int personPerspectiveDeviceColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.year}")
     private int personPerspectiveYearColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.statistics_date}")
     private int personPerspectiveStatisticsDateColumnIndex;
+    @Value("${data_export.data_sheet.person_perspective.column_index.tool_cutter_code}")
+    private int personPerspectiveToolCutterCodeColumnIndex;
 
     @Value("${data_export.data_sheet.device_perspective.first_data_row}")
     private int devicePerspectiveFirstDataRow;
-    @Value("${data_export.data_sheet.device_perspective.column_index.no}")
-    private int devicePerspectiveNoColumnIndex;
     @Value("${data_export.data_sheet.device_perspective.column_index.month}")
     private int devicePerspectiveMonthColumnIndex;
     @Value("${data_export.data_sheet.device_perspective.column_index.device}")
@@ -90,11 +90,11 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     private int devicePerspectiveYearColumnIndex;
     @Value("${data_export.data_sheet.device_perspective.column_index.statistics_date}")
     private int devicePerspectiveStatisticsDateColumnIndex;
+    @Value("${data_export.data_sheet.device_perspective.column_index.tool_cutter_code}")
+    private int devicePerspectiveToolCutterCodeColumnIndex;
 
     @Value("${data_export.data_sheet.tool_cutter_perspective.first_data_row}")
     private int toolCutterPerspectiveFirstDataRow;
-    @Value("${data_export.data_sheet.tool_cutter_perspective.column_index.no}")
-    private int toolCutterPerspectiveNoColumnIndex;
     @Value("${data_export.data_sheet.tool_cutter_perspective.column_index.month}")
     private int toolCutterPerspectiveMonthColumnIndex;
     @Value("${data_export.data_sheet.tool_cutter_perspective.column_index.tool_cutter_type}")
@@ -107,6 +107,8 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     private int toolCutterPerspectiveYearColumnIndex;
     @Value("${data_export.data_sheet.tool_cutter_perspective.column_index.statistics_date}")
     private int toolCutterPerspectiveStatisticsDateColumnIndex;
+    @Value("${data_export.data_sheet.tool_cutter_perspective.column_index.tool_cutter_code}")
+    private int toolCutterPerspectiveToolCutterCodeColumnIndex;
 
     @Value("#{'${data_export.month_array}'.split(',')}")
     private String[] monthArray;
@@ -224,10 +226,6 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
         Row row = CellUtil.getRow(rowIndex, sheet);
         Cell cell;
         try {
-            // 序号。
-            cell = CellUtil.getCell(row, personPerspectiveNoColumnIndex);
-            cell.setCellValue(index + 1);
-
             // 月份。
             cell = CellUtil.getCell(row, personPerspectiveMonthColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getMonth()).map(i -> monthArray[i]).orElse(""));
@@ -248,6 +246,10 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             cell = CellUtil.getCell(row, personPerspectiveWorthColumnIndex);
             cell.setCellValue(OptionalDouble.of(personPerspective.getWorth().doubleValue()).orElse(0));
 
+            // 返回数量。
+            cell = CellUtil.getCell(row, personPerspectiveReturningQuantityColumnIndex);
+            cell.setCellValue(Optional.ofNullable(personPerspective.getReturningQuantity()).orElse(0));
+
             // 设备。
             cell = CellUtil.getCell(row, personPerspectiveDeviceColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getDevice()).orElse(""));
@@ -259,6 +261,10 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             // 统计日期。
             cell = CellUtil.getCell(row, personPerspectiveStatisticsDateColumnIndex);
             cell.setCellValue(statisticsDate);
+
+            // 刀片代号。
+            cell = CellUtil.getCell(row, personPerspectiveToolCutterCodeColumnIndex);
+            cell.setCellValue(Optional.ofNullable(personPerspective.getToolCutterCode()).orElse(""));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +
                     (rowIndex + 1) + " 行)数据时出现异常，异常信息为: ";
@@ -280,10 +286,6 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
         Row row = CellUtil.getRow(rowIndex, sheet);
         Cell cell;
         try {
-            // 序号。
-            cell = CellUtil.getCell(row, devicePerspectiveNoColumnIndex);
-            cell.setCellValue(index + 1);
-
             // 月份。
             cell = CellUtil.getCell(row, devicePerspectiveMonthColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getMonth()).map(i -> monthArray[i]).orElse(""));
@@ -311,6 +313,10 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             // 统计日期。
             cell = CellUtil.getCell(row, devicePerspectiveStatisticsDateColumnIndex);
             cell.setCellValue(statisticsDate);
+
+            // 刀片代号。
+            cell = CellUtil.getCell(row, devicePerspectiveToolCutterCodeColumnIndex);
+            cell.setCellValue(Optional.ofNullable(devicePerspective.getToolCutterCode()).orElse(""));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +
                     (rowIndex + 1) + " 行)数据时出现异常，异常信息为: ";
@@ -332,10 +338,6 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
         Row row = CellUtil.getRow(rowIndex, sheet);
         Cell cell;
         try {
-            // 序号。
-            cell = CellUtil.getCell(row, toolCutterPerspectiveNoColumnIndex);
-            cell.setCellValue(index + 1);
-
             // 月份。
             cell = CellUtil.getCell(row, toolCutterPerspectiveMonthColumnIndex);
             cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getMonth()).map(i -> monthArray[i]).orElse(""));
@@ -359,6 +361,10 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             // 统计日期。
             cell = CellUtil.getCell(row, toolCutterPerspectiveStatisticsDateColumnIndex);
             cell.setCellValue(statisticsDate);
+
+            // 刀片代号。
+            cell = CellUtil.getCell(row, toolCutterPerspectiveToolCutterCodeColumnIndex);
+            cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getToolCutterCode()).orElse(""));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +
                     (rowIndex + 1) + " 行)数据时出现异常，异常信息为: ";

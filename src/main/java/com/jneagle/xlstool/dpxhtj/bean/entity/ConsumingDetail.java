@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class ConsumingDetail implements Entity<UuidKey> {
 
-    private static final long serialVersionUID = 547780372375006329L;
+    private static final long serialVersionUID = -101804102559080347L;
 
     private UuidKey key;
 
@@ -53,12 +53,26 @@ public class ConsumingDetail implements Entity<UuidKey> {
      */
     private String remark;
 
+    /**
+     * 刀片代码。
+     *
+     * @since 1.1.0
+     */
+    private String toolCutterCode;
+
+    /**
+     * 退回数量。
+     *
+     * @since 1.1.0
+     */
+    private Integer returningQuantity;
+
     public ConsumingDetail() {
     }
 
     public ConsumingDetail(
             UuidKey key, String toolCutterType, String device, Integer consumingQuantity, BigDecimal worth,
-            String consumingPerson, Date consumingDate, String remark
+            String consumingPerson, Date consumingDate, String remark, String toolCutterCode, Integer returningQuantity
     ) {
         this.key = key;
         this.toolCutterType = toolCutterType;
@@ -68,6 +82,8 @@ public class ConsumingDetail implements Entity<UuidKey> {
         this.consumingPerson = consumingPerson;
         this.consumingDate = consumingDate;
         this.remark = remark;
+        this.toolCutterCode = toolCutterCode;
+        this.returningQuantity = returningQuantity;
     }
 
     @Override
@@ -136,6 +152,22 @@ public class ConsumingDetail implements Entity<UuidKey> {
         this.remark = remark;
     }
 
+    public String getToolCutterCode() {
+        return toolCutterCode;
+    }
+
+    public void setToolCutterCode(String toolCutterCode) {
+        this.toolCutterCode = toolCutterCode;
+    }
+
+    public Integer getReturningQuantity() {
+        return returningQuantity;
+    }
+
+    public void setReturningQuantity(Integer returningQuantity) {
+        this.returningQuantity = returningQuantity;
+    }
+
     @Override
     public String toString() {
         return "ConsumingDetail{" +
@@ -147,6 +179,8 @@ public class ConsumingDetail implements Entity<UuidKey> {
                 ", consumingPerson='" + consumingPerson + '\'' +
                 ", consumingDate=" + consumingDate +
                 ", remark='" + remark + '\'' +
+                ", toolCutterCode='" + toolCutterCode + '\'' +
+                ", returningQuantity=" + returningQuantity +
                 '}';
     }
 }

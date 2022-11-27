@@ -92,13 +92,22 @@ public class ViewConfiguration {
     }
 
     @MappingTableModel.TableColumn(
+            columnName = "刀片代号", columnValueGetterName = "getToolCutterCode", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
             columnName = "刀片型号", columnValueGetterName = "getToolCutterType", columnClass = String.class
     )
     @MappingTableModel.TableColumn(
             columnName = "设备", columnValueGetterName = "getDevice", columnClass = String.class
     )
     @MappingTableModel.TableColumn(
+            columnName = "设备", columnValueGetterName = "getDevice", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
             columnName = "消耗数量", columnValueGetterName = "getConsumingQuantity", columnClass = Integer.class
+    )
+    @MappingTableModel.TableColumn(
+            columnName = "退回数量", columnValueGetterName = "getReturningQuantity", columnClass = Integer.class
     )
     @MappingTableModel.TableColumn(
             columnName = "价值", columnValueGetterName = "getWorth", columnClass = BigDecimal.class

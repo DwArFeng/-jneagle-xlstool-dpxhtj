@@ -82,9 +82,17 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
         String device = consumingDetail.getDevice();
         Integer consumingQuantity = Optional.ofNullable(consumingDetail.getConsumingQuantity()).orElse(0);
         BigDecimal worth = Optional.ofNullable(consumingDetail.getWorth()).orElse(BigDecimal.ZERO);
-        PersonPerspectiveKey personPerspectiveKey = new PersonPerspectiveKey(year, month, name, toolCutterType, device);
-        DevicePerspectiveKey devicePerspectiveKey = new DevicePerspectiveKey(year, month, toolCutterType, device);
-        ToolCutterPerspectiveKey toolCutterPerspectiveKey = new ToolCutterPerspectiveKey(year, month, toolCutterType);
+        String toolCutterCode = consumingDetail.getToolCutterCode();
+        Integer returningQuantity = Optional.ofNullable(consumingDetail.getReturningQuantity()).orElse(0);
+        PersonPerspectiveKey personPerspectiveKey = new PersonPerspectiveKey(
+                year, month, name, toolCutterType, device, toolCutterCode
+        );
+        DevicePerspectiveKey devicePerspectiveKey = new DevicePerspectiveKey(
+                year, month, toolCutterType, device, toolCutterCode
+        );
+        ToolCutterPerspectiveKey toolCutterPerspectiveKey = new ToolCutterPerspectiveKey(
+                year, month, toolCutterType, toolCutterCode
+        );
 
         // 处理 PersonPerspective。
         PersonPerspective oldPersonPerspective = personPerspectiveMap.getOrDefault(
@@ -95,7 +103,9 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                 oldPersonPerspective.getToolCutterType(),
                 oldPersonPerspective.getConsumingQuantity() + consumingQuantity,
                 oldPersonPerspective.getWorth().add(worth),
-                oldPersonPerspective.getDevice(), oldPersonPerspective.getYear()
+                oldPersonPerspective.getDevice(), oldPersonPerspective.getYear(),
+                oldPersonPerspective.getToolCutterCode(),
+                oldPersonPerspective.getReturningQuantity() + returningQuantity
         );
         personPerspectiveMap.put(personPerspectiveKey, neoPersonPerspective);
 
@@ -108,7 +118,8 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                 oldDevicePerspective.getToolCutterType(),
                 oldDevicePerspective.getConsumingQuantity() + consumingQuantity,
                 oldDevicePerspective.getWorth().add(worth),
-                oldDevicePerspective.getYear()
+                oldDevicePerspective.getYear(),
+                oldDevicePerspective.getToolCutterCode()
         );
         devicePerspectiveMap.put(devicePerspectiveKey, neoDevicePerspective);
 
@@ -121,7 +132,8 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                 oldToolCutterPerspective.getToolCutterType(),
                 oldToolCutterPerspective.getConsumingQuantity() + consumingQuantity,
                 oldToolCutterPerspective.getWorth().add(worth),
-                oldToolCutterPerspective.getYear()
+                oldToolCutterPerspective.getYear(),
+                oldToolCutterPerspective.getToolCutterCode()
         );
         toolCutterPerspectiveMap.put(toolCutterPerspectiveKey, neoToolCutterPerspective);
     }
@@ -129,19 +141,20 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
     private PersonPerspective initPersonPerspective(PersonPerspectiveKey key) {
         return new PersonPerspective(
                 key.getMonth(), key.getName(), key.getToolCutterType(), 0, BigDecimal.ZERO, key.getDevice(),
-                key.getYear()
+                key.getYear(), key.getToolCutterCode(), 0
         );
     }
 
     private DevicePerspective initDevicePerspective(DevicePerspectiveKey key) {
         return new DevicePerspective(
-                key.getMonth(), key.getDevice(), key.getToolCutterType(), 0, BigDecimal.ZERO, key.getYear()
+                key.getMonth(), key.getDevice(), key.getToolCutterType(), 0, BigDecimal.ZERO, key.getYear(),
+                key.getToolCutterCode()
         );
     }
 
     private ToolCutterPerspective initToolCutterPerspective(ToolCutterPerspectiveKey key) {
         return new ToolCutterPerspective(
-                key.getMonth(), key.getToolCutterType(), 0, BigDecimal.ZERO, key.getYear()
+                key.getMonth(), key.getToolCutterType(), 0, BigDecimal.ZERO, key.getYear(), key.getToolCutterCode()
         );
     }
 
@@ -152,13 +165,17 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
         private final String name;
         private final String toolCutterType;
         private final String device;
+        private final String toolCutterCode;
 
-        public PersonPerspectiveKey(Integer year, Integer month, String name, String toolCutterType, String device) {
+        public PersonPerspectiveKey(
+                Integer year, Integer month, String name, String toolCutterType, String device, String toolCutterCode
+        ) {
             this.year = year;
             this.month = month;
             this.name = name;
             this.toolCutterType = toolCutterType;
             this.device = device;
+            this.toolCutterCode = toolCutterCode;
         }
 
         public Integer getYear() {
@@ -181,6 +198,10 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             return device;
         }
 
+        public String getToolCutterCode() {
+            return toolCutterCode;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -193,7 +214,8 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             if (!Objects.equals(name, that.name)) return false;
             if (!Objects.equals(toolCutterType, that.toolCutterType))
                 return false;
-            return Objects.equals(device, that.device);
+            if (!Objects.equals(device, that.device)) return false;
+            return Objects.equals(toolCutterCode, that.toolCutterCode);
         }
 
         @Override
@@ -203,6 +225,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             result = 31 * result + (name != null ? name.hashCode() : 0);
             result = 31 * result + (toolCutterType != null ? toolCutterType.hashCode() : 0);
             result = 31 * result + (device != null ? device.hashCode() : 0);
+            result = 31 * result + (toolCutterCode != null ? toolCutterCode.hashCode() : 0);
             return result;
         }
 
@@ -214,6 +237,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                     ", name='" + name + '\'' +
                     ", toolCutterType='" + toolCutterType + '\'' +
                     ", device='" + device + '\'' +
+                    ", toolCutterCode='" + toolCutterCode + '\'' +
                     '}';
         }
     }
@@ -224,12 +248,16 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
         private final Integer month;
         private final String toolCutterType;
         private final String device;
+        private final String toolCutterCode;
 
-        public DevicePerspectiveKey(Integer year, Integer month, String toolCutterType, String device) {
+        public DevicePerspectiveKey(
+                Integer year, Integer month, String toolCutterType, String device, String toolCutterCode
+        ) {
             this.year = year;
             this.month = month;
             this.toolCutterType = toolCutterType;
             this.device = device;
+            this.toolCutterCode = toolCutterCode;
         }
 
         public Integer getYear() {
@@ -248,6 +276,10 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             return device;
         }
 
+        public String getToolCutterCode() {
+            return toolCutterCode;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -259,7 +291,8 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             if (!Objects.equals(month, that.month)) return false;
             if (!Objects.equals(toolCutterType, that.toolCutterType))
                 return false;
-            return Objects.equals(device, that.device);
+            if (!Objects.equals(device, that.device)) return false;
+            return Objects.equals(toolCutterCode, that.toolCutterCode);
         }
 
         @Override
@@ -268,6 +301,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             result = 31 * result + (month != null ? month.hashCode() : 0);
             result = 31 * result + (toolCutterType != null ? toolCutterType.hashCode() : 0);
             result = 31 * result + (device != null ? device.hashCode() : 0);
+            result = 31 * result + (toolCutterCode != null ? toolCutterCode.hashCode() : 0);
             return result;
         }
 
@@ -278,6 +312,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                     ", month=" + month +
                     ", toolCutterType='" + toolCutterType + '\'' +
                     ", device='" + device + '\'' +
+                    ", toolCutterCode='" + toolCutterCode + '\'' +
                     '}';
         }
     }
@@ -287,11 +322,13 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
         private final Integer year;
         private final Integer month;
         private final String toolCutterType;
+        private final String toolCutterCode;
 
-        public ToolCutterPerspectiveKey(Integer year, Integer month, String toolCutterType) {
+        public ToolCutterPerspectiveKey(Integer year, Integer month, String toolCutterType, String toolCutterCode) {
             this.year = year;
             this.month = month;
             this.toolCutterType = toolCutterType;
+            this.toolCutterCode = toolCutterCode;
         }
 
         public Integer getYear() {
@@ -306,6 +343,10 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             return toolCutterType;
         }
 
+        public String getToolCutterCode() {
+            return toolCutterCode;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -315,7 +356,9 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
 
             if (!Objects.equals(year, that.year)) return false;
             if (!Objects.equals(month, that.month)) return false;
-            return Objects.equals(toolCutterType, that.toolCutterType);
+            if (!Objects.equals(toolCutterType, that.toolCutterType))
+                return false;
+            return Objects.equals(toolCutterCode, that.toolCutterCode);
         }
 
         @Override
@@ -323,6 +366,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
             int result = year != null ? year.hashCode() : 0;
             result = 31 * result + (month != null ? month.hashCode() : 0);
             result = 31 * result + (toolCutterType != null ? toolCutterType.hashCode() : 0);
+            result = 31 * result + (toolCutterCode != null ? toolCutterCode.hashCode() : 0);
             return result;
         }
 
@@ -332,6 +376,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                     "year=" + year +
                     ", month=" + month +
                     ", toolCutterType='" + toolCutterType + '\'' +
+                    ", toolCutterCode='" + toolCutterCode + '\'' +
                     '}';
         }
     }

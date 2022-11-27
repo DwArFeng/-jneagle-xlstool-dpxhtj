@@ -23,7 +23,9 @@ public class StatisticResult implements Dto {
     }
 
     public StatisticResult(
-            List<PersonPerspective> personPerspectives, List<DevicePerspective> devicePerspectives, List<ToolCutterPerspective> toolCutterPerspectives
+            List<PersonPerspective> personPerspectives,
+            List<DevicePerspective> devicePerspectives,
+            List<ToolCutterPerspective> toolCutterPerspectives
     ) {
         this.personPerspectives = personPerspectives;
         this.devicePerspectives = devicePerspectives;
@@ -65,7 +67,7 @@ public class StatisticResult implements Dto {
 
     public static class PersonPerspective implements Dto {
 
-        private static final long serialVersionUID = -8460931232697750091L;
+        private static final long serialVersionUID = -4006576770982033447L;
 
         /**
          * 月份（0-11）。
@@ -102,12 +104,26 @@ public class StatisticResult implements Dto {
          */
         private Integer year;
 
+        /**
+         * 刀片代码。
+         *
+         * @since 1.1.0
+         */
+        private String toolCutterCode;
+
+        /**
+         * 退回数量。
+         *
+         * @since 1.1.0
+         */
+        private Integer returningQuantity;
+
         public PersonPerspective() {
         }
 
         public PersonPerspective(
                 Integer month, String name, String toolCutterType, Integer consumingQuantity, BigDecimal worth,
-                String device, Integer year
+                String device, Integer year, String toolCutterCode, Integer returningQuantity
         ) {
             this.month = month;
             this.name = name;
@@ -116,6 +132,8 @@ public class StatisticResult implements Dto {
             this.worth = worth;
             this.device = device;
             this.year = year;
+            this.toolCutterCode = toolCutterCode;
+            this.returningQuantity = returningQuantity;
         }
 
         public Integer getMonth() {
@@ -174,6 +192,22 @@ public class StatisticResult implements Dto {
             this.year = year;
         }
 
+        public String getToolCutterCode() {
+            return toolCutterCode;
+        }
+
+        public void setToolCutterCode(String toolCutterCode) {
+            this.toolCutterCode = toolCutterCode;
+        }
+
+        public Integer getReturningQuantity() {
+            return returningQuantity;
+        }
+
+        public void setReturningQuantity(Integer returningQuantity) {
+            this.returningQuantity = returningQuantity;
+        }
+
         @Override
         public String toString() {
             return "PersonPerspective{" +
@@ -184,13 +218,15 @@ public class StatisticResult implements Dto {
                     ", worth=" + worth +
                     ", device='" + device + '\'' +
                     ", year=" + year +
+                    ", toolCutterCode='" + toolCutterCode + '\'' +
+                    ", returningQuantity=" + returningQuantity +
                     '}';
         }
     }
 
     public static class DevicePerspective implements Dto {
 
-        private static final long serialVersionUID = -7339159446310129483L;
+        private static final long serialVersionUID = 7975749781441341171L;
 
         /**
          * 月份（0-11）。
@@ -222,12 +258,19 @@ public class StatisticResult implements Dto {
          */
         private Integer year;
 
+        /**
+         * 刀片代码。
+         *
+         * @since 1.1.0
+         */
+        private String toolCutterCode;
+
         public DevicePerspective() {
         }
 
         public DevicePerspective(
                 Integer month, String device, String toolCutterType, Integer consumingQuantity, BigDecimal worth,
-                Integer year
+                Integer year, String toolCutterCode
         ) {
             this.month = month;
             this.device = device;
@@ -235,6 +278,7 @@ public class StatisticResult implements Dto {
             this.consumingQuantity = consumingQuantity;
             this.worth = worth;
             this.year = year;
+            this.toolCutterCode = toolCutterCode;
         }
 
         public Integer getMonth() {
@@ -285,6 +329,14 @@ public class StatisticResult implements Dto {
             this.year = year;
         }
 
+        public String getToolCutterCode() {
+            return toolCutterCode;
+        }
+
+        public void setToolCutterCode(String toolCutterCode) {
+            this.toolCutterCode = toolCutterCode;
+        }
+
         @Override
         public String toString() {
             return "DevicePerspective{" +
@@ -294,13 +346,14 @@ public class StatisticResult implements Dto {
                     ", consumingQuantity=" + consumingQuantity +
                     ", worth=" + worth +
                     ", year=" + year +
+                    ", toolCutterCode='" + toolCutterCode + '\'' +
                     '}';
         }
     }
 
     public static class ToolCutterPerspective implements Dto {
 
-        private static final long serialVersionUID = -6260888092555350713L;
+        private static final long serialVersionUID = -3584398097544245779L;
 
         /**
          * 月份（0-11）。
@@ -327,17 +380,26 @@ public class StatisticResult implements Dto {
          */
         private Integer year;
 
+        /**
+         * 刀片代码。
+         *
+         * @since 1.1.0
+         */
+        private String toolCutterCode;
+
         public ToolCutterPerspective() {
         }
 
         public ToolCutterPerspective(
-                Integer month, String toolCutterType, Integer consumingQuantity, BigDecimal worth, Integer year
+                Integer month, String toolCutterType, Integer consumingQuantity, BigDecimal worth, Integer year,
+                String toolCutterCode
         ) {
             this.month = month;
             this.toolCutterType = toolCutterType;
             this.consumingQuantity = consumingQuantity;
             this.worth = worth;
             this.year = year;
+            this.toolCutterCode = toolCutterCode;
         }
 
         public Integer getMonth() {
@@ -380,6 +442,14 @@ public class StatisticResult implements Dto {
             this.year = year;
         }
 
+        public String getToolCutterCode() {
+            return toolCutterCode;
+        }
+
+        public void setToolCutterCode(String toolCutterCode) {
+            this.toolCutterCode = toolCutterCode;
+        }
+
         @Override
         public String toString() {
             return "ToolCutterPerspective{" +
@@ -388,6 +458,7 @@ public class StatisticResult implements Dto {
                     ", consumingQuantity=" + consumingQuantity +
                     ", worth=" + worth +
                     ", year=" + year +
+                    ", toolCutterCode='" + toolCutterCode + '\'' +
                     '}';
         }
     }

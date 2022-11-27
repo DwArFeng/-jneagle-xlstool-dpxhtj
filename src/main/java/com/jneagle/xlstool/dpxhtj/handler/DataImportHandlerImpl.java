@@ -51,6 +51,8 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
     private int consumingDateColumnIndex;
     @Value("${data_import.data_sheet.column_index.remark}")
     private int remarkColumnIndex;
+    @Value("${data_import.data_sheet.column_index.returning_quantity}")
+    private int returningQuantityColumnIndex;
 
     public DataImportHandlerImpl(
             ConsumingDetailMaintainService consumingDetailMaintainService,
@@ -183,8 +185,13 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
             cellValue = evaluator.evaluate(CellUtil.getCell(row, remarkColumnIndex));
             String remark = Optional.ofNullable(cellValue).map(CellValue::getStringValue).orElse(null);
 
+            // 退回数量。
+            cellValue = evaluator.evaluate(CellUtil.getCell(row, returningQuantityColumnIndex));
+            Integer returningQuantity = Optional.ofNullable(cellValue).map(v -> (int) v.getNumberValue()).orElse(null);
+
             consumingDetails.add(new ConsumingDetail(
-                    null, toolCutterType, device, consumingQuantity, worth, consumingPerson, consumingDate, remark
+                    null, toolCutterType, device, consumingQuantity, worth, consumingPerson, consumingDate, remark,
+                    sheetName, returningQuantity
             ));
         } catch (Exception e) {
             String warnMessage = "读取数据表的第 " + rowIndex + " 行(对应数据表是第 " +
