@@ -25,9 +25,9 @@
         <log4j2.version>2.17.2</log4j2.version>
         <slf4j.version>1.7.5</slf4j.version>
         <spring.version>5.3.20</spring.version>
-        <dutil.version>beta-0.3.1.a</dutil.version>
-        <subgrade.version>1.2.13.b</subgrade.version>
-        <spring-terminator.version>1.0.9.a</spring-terminator.version>
+        <dutil.version>beta-0.3.2.a</dutil.version>
+        <subgrade.version>1.2.14.a</subgrade.version>
+        <spring-terminator.version>1.0.10.a</spring-terminator.version>
         <dozer.version>5.5.1</dozer.version>
         <poi.version>4.1.1</poi.version>
         <!-- Maven插件版本声明 -->
