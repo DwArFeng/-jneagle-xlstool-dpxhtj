@@ -6,12 +6,11 @@ import com.dwarfeng.dutil.basic.gui.swing.MappingTableModel;
 import com.dwarfeng.dutil.basic.gui.swing.SwingUtil;
 import com.dwarfeng.subgrade.stack.exception.ServiceException;
 import com.jneagle.xlstool.dpxhtj.bean.entity.ConsumingDetail;
+import com.jneagle.xlstool.dpxhtj.bean.entity.ExportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.bean.entity.ImportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.handler.ModalHandler;
 import com.jneagle.xlstool.dpxhtj.handler.NotificationHandler;
-import com.jneagle.xlstool.dpxhtj.service.ConsumingDetailMaintainService;
-import com.jneagle.xlstool.dpxhtj.service.DataImportService;
-import com.jneagle.xlstool.dpxhtj.service.ImportErrorInfoMaintainService;
+import com.jneagle.xlstool.dpxhtj.service.*;
 import com.jneagle.xlstool.dpxhtj.structure.ModalItem;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressObserver;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
@@ -47,12 +46,14 @@ import java.util.Optional;
 @DependsOn("viewConfiguration")
 public class DataImportPanel extends JPanel {
 
-    private static final long serialVersionUID = -1521715549303446921L;
+    private static final long serialVersionUID = 4270914754892524812L;
     private static final Logger LOGGER = LoggerFactory.getLogger(DataImportPanel.class);
 
     private final DataImportService dataImportService;
     private final ConsumingDetailMaintainService consumingDetailMaintainService;
     private final ImportErrorInfoMaintainService importErrorInfoMaintainService;
+    private final ExportErrorInfoMaintainService exportErrorInfoMaintainService;
+    private final ClearService clearService;
 
     private final NotificationHandler notificationHandler;
     private final ModalHandler modalHandler;
@@ -65,6 +66,7 @@ public class DataImportPanel extends JPanel {
     private final ReferenceModel<ProgressStatus> progressStatusModel;
     private final MappingTableModel<ConsumingDetail> consumingDetailTableModel;
     private final MappingTableModel<ImportErrorInfo> importErrorInfoTableModel;
+    private final MappingTableModel<ExportErrorInfo> exportErrorInfoTableModel;
 
     private final DataImportErrorDialog dataImportErrorDialog;
 
@@ -74,6 +76,7 @@ public class DataImportPanel extends JPanel {
     private final JButton importFileButton = new JButton();
     private final JTextField resultTextField = new JTextField();
     private final JButton showErrorButton = new JButton();
+    private final JButton clearButton = new JButton();
 
     private final ImportFileObserver importFileObserver = new ImportFileObserver();
     private final SelectFileAction selectFileAction = new SelectFileAction();
@@ -83,11 +86,14 @@ public class DataImportPanel extends JPanel {
     private final DataImportProgressObserver dataImportProgressObserver = new DataImportProgressObserver();
     private final DataImportTableModelListener dataImportTableModelListener = new DataImportTableModelListener();
     private final ShowErrorDialogAction showErrorDialogAction = new ShowErrorDialogAction();
+    private final ClearAction clearAction = new ClearAction();
 
     public DataImportPanel(
             DataImportService dataImportService,
             ConsumingDetailMaintainService consumingDetailMaintainService,
             ImportErrorInfoMaintainService importErrorInfoMaintainService,
+            ExportErrorInfoMaintainService exportErrorInfoMaintainService,
+            ClearService clearService,
             NotificationHandler notificationHandler,
             ModalHandler modalHandler,
             ThreadPoolTaskExecutor executor,
@@ -97,11 +103,14 @@ public class DataImportPanel extends JPanel {
             @Qualifier("progressStatusModel") ReferenceModel<ProgressStatus> progressStatusModel,
             @Qualifier("consumingDetailTableModel") MappingTableModel<ConsumingDetail> consumingDetailTableModel,
             @Qualifier("importErrorInfoTableModel") MappingTableModel<ImportErrorInfo> importErrorInfoTableModel,
+            @Qualifier("exportErrorInfoTableModel") MappingTableModel<ExportErrorInfo> exportErrorInfoTableModel,
             DataImportErrorDialog dataImportErrorDialog
     ) {
         this.dataImportService = dataImportService;
         this.consumingDetailMaintainService = consumingDetailMaintainService;
         this.importErrorInfoMaintainService = importErrorInfoMaintainService;
+        this.exportErrorInfoMaintainService = exportErrorInfoMaintainService;
+        this.clearService = clearService;
         this.notificationHandler = notificationHandler;
         this.modalHandler = modalHandler;
         this.executor = executor;
@@ -111,6 +120,7 @@ public class DataImportPanel extends JPanel {
         this.progressStatusModel = progressStatusModel;
         this.consumingDetailTableModel = consumingDetailTableModel;
         this.importErrorInfoTableModel = importErrorInfoTableModel;
+        this.exportErrorInfoTableModel = exportErrorInfoTableModel;
         this.dataImportErrorDialog = dataImportErrorDialog;
     }
 
@@ -119,9 +129,9 @@ public class DataImportPanel extends JPanel {
     public void postConstruct() {
         // 初始化界面。
         GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[]{0, 0, 0};
+        gridBagLayout.columnWidths = new int[]{0, 0, 0, 0};
         gridBagLayout.rowHeights = new int[]{0, 0, 0};
-        gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0};
+        gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0};
         gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0};
         setLayout(gridBagLayout);
 
@@ -141,6 +151,7 @@ public class DataImportPanel extends JPanel {
         gbcImportFileTextField.fill = GridBagConstraints.BOTH;
         gbcImportFileTextField.gridx = 1;
         gbcImportFileTextField.gridy = 0;
+        gbcImportFileTextField.gridwidth = 2;
         add(importFileTextField, gbcImportFileTextField);
 
         // 选择文件按钮。
@@ -149,7 +160,7 @@ public class DataImportPanel extends JPanel {
         GridBagConstraints gbcSelectFileButton = new GridBagConstraints();
         gbcSelectFileButton.insets = new Insets(0, 0, 0, 0);
         gbcSelectFileButton.fill = GridBagConstraints.BOTH;
-        gbcSelectFileButton.gridx = 2;
+        gbcSelectFileButton.gridx = 3;
         gbcSelectFileButton.gridy = 0;
         add(selectFileButton, gbcSelectFileButton);
 
@@ -169,15 +180,16 @@ public class DataImportPanel extends JPanel {
         gbcPasswordField.fill = GridBagConstraints.BOTH;
         gbcPasswordField.gridx = 1;
         gbcPasswordField.gridy = 1;
+        gbcPasswordField.gridwidth = 2;
         add(passwordField, gbcPasswordField);
 
         // 读取文件按钮。
         importFileButton.setAction(importFileAction);
-        importFileButton.setText("导入");
+        importFileButton.setText("追加");
         GridBagConstraints gbcImportFileButton = new GridBagConstraints();
         gbcImportFileButton.insets = new Insets(0, 0, 0, 0);
         gbcImportFileButton.fill = GridBagConstraints.BOTH;
-        gbcImportFileButton.gridx = 2;
+        gbcImportFileButton.gridx = 3;
         gbcImportFileButton.gridy = 1;
         add(importFileButton, gbcImportFileButton);
 
@@ -208,6 +220,16 @@ public class DataImportPanel extends JPanel {
         gbcShowErrorButton.gridx = 2;
         gbcShowErrorButton.gridy = 2;
         add(showErrorButton, gbcShowErrorButton);
+
+        // 清除按钮。
+        clearButton.setAction(clearAction);
+        clearButton.setText("清除数据");
+        GridBagConstraints gbcClearButton = new GridBagConstraints();
+        gbcClearButton.insets = new Insets(0, 0, 0, 0);
+        gbcClearButton.fill = GridBagConstraints.BOTH;
+        gbcClearButton.gridx = 3;
+        gbcClearButton.gridy = 2;
+        add(clearButton, gbcClearButton);
 
         // 添加侦听器。
         importFileModel.addObserver(importFileObserver);
@@ -441,6 +463,57 @@ public class DataImportPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             dataImportErrorDialog.setLocationRelativeTo(SwingUtilities.getRoot(DataImportPanel.this));
             dataImportErrorDialog.setVisible(true);
+        }
+    }
+
+    private class ClearAction extends AbstractAction implements Runnable {
+
+        private static final long serialVersionUID = -2926337311619632697L;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // 在后台线程中执行方法，避免前端界面卡顿。
+            executor.execute(this);
+        }
+
+        @Override
+        public void run() {
+            try {
+                // 更新通知面板标签文本。
+                notificationModel.set("清除数据...");
+
+                // 创建侦听
+                clearService.addObserver(dataImportProgressObserver);
+                // 调用接口读取文件，并捕获异常。
+                try {
+                    clearService.clear();
+                } catch (ServiceException ex) {
+                    // 通知用户。
+                    notificationHandler.warn(
+                            SwingUtilities.getRoot(DataImportPanel.this), "程序内部错误，请联系开发人员"
+                    );
+                    // 更新通知面板标签文本。
+                    notificationModel.set("数据清除失败");
+                    return;
+                } finally {
+                    // 移除侦听。
+                    dataImportService.removeObserver(dataImportProgressObserver);
+                }
+
+                // 重新加载结构化数据。
+                consumingDetailTableModel.clear();
+                importErrorInfoTableModel.clear();
+                exportErrorInfoTableModel.clear();
+                consumingDetailTableModel.addAll(consumingDetailMaintainService.lookupAsList());
+                importErrorInfoTableModel.addAll(importErrorInfoMaintainService.lookupAsList());
+                exportErrorInfoTableModel.addAll(exportErrorInfoMaintainService.lookupAsList());
+
+                // 更新通知面板标签文本。
+                notificationModel.set("数据清除成功");
+            } catch (Exception ex) {
+                LOGGER.warn("导入文件时发生异常，异常信息如下: ", ex);
+                notificationHandler.error(SwingUtilities.getRoot(DataImportPanel.this), "导入文件时发出异常，详见日志");
+            }
         }
     }
 }

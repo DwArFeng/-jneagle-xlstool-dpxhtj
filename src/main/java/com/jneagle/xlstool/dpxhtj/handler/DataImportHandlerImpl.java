@@ -5,7 +5,6 @@ import com.jneagle.xlstool.dpxhtj.bean.entity.ConsumingDetail;
 import com.jneagle.xlstool.dpxhtj.bean.entity.ImportErrorInfo;
 import com.jneagle.xlstool.dpxhtj.exception.WrongPasswordException;
 import com.jneagle.xlstool.dpxhtj.service.ConsumingDetailMaintainService;
-import com.jneagle.xlstool.dpxhtj.service.ExportErrorInfoMaintainService;
 import com.jneagle.xlstool.dpxhtj.service.ImportErrorInfoMaintainService;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +31,6 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
 
     private final ConsumingDetailMaintainService consumingDetailMaintainService;
     private final ImportErrorInfoMaintainService importErrorInfoMaintainService;
-    private final ExportErrorInfoMaintainService exportErrorInfoMaintainService;
 
     @Value("${data_import.valid_sheet_name_regex}")
     private String validSheetNameRegex;
@@ -56,12 +54,10 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
 
     public DataImportHandlerImpl(
             ConsumingDetailMaintainService consumingDetailMaintainService,
-            ImportErrorInfoMaintainService importErrorInfoMaintainService,
-            ExportErrorInfoMaintainService exportErrorInfoMaintainService
+            ImportErrorInfoMaintainService importErrorInfoMaintainService
     ) {
         this.consumingDetailMaintainService = consumingDetailMaintainService;
         this.importErrorInfoMaintainService = importErrorInfoMaintainService;
-        this.exportErrorInfoMaintainService = exportErrorInfoMaintainService;
     }
 
     @Override
@@ -69,11 +65,6 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
         try {
             // 广播进度变更事件。
             fireProgressChanged(ProgressStatus.UNCERTAIN);
-
-            // 清空相关实体的维护服务。
-            consumingDetailMaintainService.clear();
-            importErrorInfoMaintainService.clear();
-            exportErrorInfoMaintainService.clear();
 
             // 执行加载动作。
             Workbook workbook = parseWorkbook(file, password);
