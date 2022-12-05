@@ -67,7 +67,7 @@ public class StatisticResult implements Dto {
 
     public static class PersonPerspective implements Dto {
 
-        private static final long serialVersionUID = -4006576770982033447L;
+        private static final long serialVersionUID = 5761280856459694185L;
 
         /**
          * 月份（0-11）。
@@ -118,12 +118,34 @@ public class StatisticResult implements Dto {
          */
         private Integer returningQuantity;
 
+        /**
+         * 退回使用等级: 01级。
+         *
+         * @since 1.1.1
+         */
+        private Integer returningUsageG01Quantity;
+
+        /**
+         * 退回使用等级: 02级。
+         *
+         * @since 1.1.1
+         */
+        private Integer returningUsageG02Quantity;
+
+        /**
+         * 退回使用等级: 03级。
+         *
+         * @since 1.1.1
+         */
+        private Integer returningUsageG03Quantity;
+
         public PersonPerspective() {
         }
 
         public PersonPerspective(
                 Integer month, String name, String toolCutterType, Integer consumingQuantity, BigDecimal worth,
-                String device, Integer year, String toolCutterCode, Integer returningQuantity
+                String device, Integer year, String toolCutterCode, Integer returningQuantity,
+                Integer returningUsageG01Quantity, Integer returningUsageG02Quantity, Integer returningUsageG03Quantity
         ) {
             this.month = month;
             this.name = name;
@@ -134,6 +156,9 @@ public class StatisticResult implements Dto {
             this.year = year;
             this.toolCutterCode = toolCutterCode;
             this.returningQuantity = returningQuantity;
+            this.returningUsageG01Quantity = returningUsageG01Quantity;
+            this.returningUsageG02Quantity = returningUsageG02Quantity;
+            this.returningUsageG03Quantity = returningUsageG03Quantity;
         }
 
         public Integer getMonth() {
@@ -208,6 +233,30 @@ public class StatisticResult implements Dto {
             this.returningQuantity = returningQuantity;
         }
 
+        public Integer getReturningUsageG01Quantity() {
+            return returningUsageG01Quantity;
+        }
+
+        public void setReturningUsageG01Quantity(Integer returningUsageG01Quantity) {
+            this.returningUsageG01Quantity = returningUsageG01Quantity;
+        }
+
+        public Integer getReturningUsageG02Quantity() {
+            return returningUsageG02Quantity;
+        }
+
+        public void setReturningUsageG02Quantity(Integer returningUsageG02Quantity) {
+            this.returningUsageG02Quantity = returningUsageG02Quantity;
+        }
+
+        public Integer getReturningUsageG03Quantity() {
+            return returningUsageG03Quantity;
+        }
+
+        public void setReturningUsageG03Quantity(Integer returningUsageG03Quantity) {
+            this.returningUsageG03Quantity = returningUsageG03Quantity;
+        }
+
         @Override
         public String toString() {
             return "PersonPerspective{" +
@@ -220,6 +269,9 @@ public class StatisticResult implements Dto {
                     ", year=" + year +
                     ", toolCutterCode='" + toolCutterCode + '\'' +
                     ", returningQuantity=" + returningQuantity +
+                    ", returningUsageG01Quantity=" + returningUsageG01Quantity +
+                    ", returningUsageG02Quantity=" + returningUsageG02Quantity +
+                    ", returningUsageG03Quantity=" + returningUsageG03Quantity +
                     '}';
         }
     }

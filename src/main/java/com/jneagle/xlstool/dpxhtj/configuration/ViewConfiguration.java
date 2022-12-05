@@ -110,6 +110,9 @@ public class ViewConfiguration {
             columnName = "退回数量", columnValueGetterName = "getReturningQuantity", columnClass = Integer.class
     )
     @MappingTableModel.TableColumn(
+            columnName = "使用率", columnValueGetterName = "getReturningUsageInfo", columnClass = String.class
+    )
+    @MappingTableModel.TableColumn(
             columnName = "价值", columnValueGetterName = "getWorth", columnClass = BigDecimal.class
     )
     @MappingTableModel.TableColumn(

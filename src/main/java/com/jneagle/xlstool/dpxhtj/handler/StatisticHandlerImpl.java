@@ -8,6 +8,7 @@ import com.jneagle.xlstool.dpxhtj.bean.dto.StatisticResult.ToolCutterPerspective
 import com.jneagle.xlstool.dpxhtj.bean.entity.ConsumingDetail;
 import com.jneagle.xlstool.dpxhtj.service.ConsumingDetailMaintainService;
 import com.jneagle.xlstool.dpxhtj.structure.ProgressStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,6 +18,15 @@ import java.util.*;
 public class StatisticHandlerImpl extends AbstractProgressHandler implements StatisticHandler {
 
     private final ConsumingDetailMaintainService consumingDetailMaintainService;
+
+    @Value("${statistics.regex.returning_usage.g01}")
+    private String returningUsageG01Regex;
+
+    @Value("${statistics.regex.returning_usage.g02}")
+    private String returningUsageG02Regex;
+
+    @Value("${statistics.regex.returning_usage.g03}")
+    private String returningUsageG03Regex;
 
     public StatisticHandlerImpl(ConsumingDetailMaintainService consumingDetailMaintainService) {
         this.consumingDetailMaintainService = consumingDetailMaintainService;
@@ -94,6 +104,24 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                 year, month, toolCutterType, toolCutterCode
         );
 
+        // 处理退回使用等级。
+        Integer returningUsageG01Quantity = 0;
+        Integer returningUsageG02Quantity = 0;
+        Integer returningUsageG03Quantity = 0;
+
+        String returningUsageInfo = consumingDetail.getReturningUsageInfo();
+        if (Objects.nonNull(returningUsageInfo)) {
+            if (returningUsageInfo.matches(returningUsageG01Regex)) {
+                returningUsageG01Quantity = returningQuantity;
+            }
+            if (returningUsageInfo.matches(returningUsageG02Regex)) {
+                returningUsageG02Quantity = returningQuantity;
+            }
+            if (returningUsageInfo.matches(returningUsageG03Regex)) {
+                returningUsageG03Quantity = returningQuantity;
+            }
+        }
+
         // 处理 PersonPerspective。
         PersonPerspective oldPersonPerspective = personPerspectiveMap.getOrDefault(
                 personPerspectiveKey, initPersonPerspective(personPerspectiveKey)
@@ -105,7 +133,10 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
                 oldPersonPerspective.getWorth().add(worth),
                 oldPersonPerspective.getDevice(), oldPersonPerspective.getYear(),
                 oldPersonPerspective.getToolCutterCode(),
-                oldPersonPerspective.getReturningQuantity() + returningQuantity
+                oldPersonPerspective.getReturningQuantity() + returningQuantity,
+                oldPersonPerspective.getReturningUsageG01Quantity() + returningUsageG01Quantity,
+                oldPersonPerspective.getReturningUsageG02Quantity() + returningUsageG02Quantity,
+                oldPersonPerspective.getReturningUsageG03Quantity() + returningUsageG03Quantity
         );
         personPerspectiveMap.put(personPerspectiveKey, neoPersonPerspective);
 
@@ -141,7 +172,7 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
     private PersonPerspective initPersonPerspective(PersonPerspectiveKey key) {
         return new PersonPerspective(
                 key.getMonth(), key.getName(), key.getToolCutterType(), 0, BigDecimal.ZERO, key.getDevice(),
-                key.getYear(), key.getToolCutterCode(), 0
+                key.getYear(), key.getToolCutterCode(), 0, 0, 0, 0
         );
     }
 

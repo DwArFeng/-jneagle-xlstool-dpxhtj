@@ -53,6 +53,8 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
     private int remarkColumnIndex;
     @Value("${data_import.data_sheet.column_index.returning_quantity}")
     private int returningQuantityColumnIndex;
+    @Value("${data_import.data_sheet.column_index.returning_usage_info}")
+    private int returningUsageInfoColumnIndex;
 
     public DataImportHandlerImpl(
             ConsumingDetailMaintainService consumingDetailMaintainService,
@@ -147,6 +149,7 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
         }
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private void loadRow(
             FormulaEvaluator evaluator, String sheetName, int rowIndex, Row row, List<ConsumingDetail> consumingDetails,
             List<ImportErrorInfo> importErrorInfos
@@ -189,9 +192,13 @@ public class DataImportHandlerImpl extends AbstractProgressHandler implements Da
             cellValue = evaluator.evaluate(CellUtil.getCell(row, returningQuantityColumnIndex));
             Integer returningQuantity = Optional.ofNullable(cellValue).map(v -> (int) v.getNumberValue()).orElse(null);
 
+            // 退回使用信息。
+            cellValue = evaluator.evaluate(CellUtil.getCell(row, returningUsageInfoColumnIndex));
+            String returningUsageInfo = Optional.ofNullable(cellValue).map(CellValue::getStringValue).orElse(null);
+
             consumingDetails.add(new ConsumingDetail(
                     null, toolCutterType, device, consumingQuantity, worth, consumingPerson, consumingDate, remark,
-                    sheetName, returningQuantity
+                    sheetName, returningQuantity, returningUsageInfo
             ));
         } catch (Exception e) {
             String warnMessage = "读取数据表的第 " + rowIndex + " 行(对应数据表是第 " +

@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class ConsumingDetail implements Entity<UuidKey> {
 
-    private static final long serialVersionUID = -101804102559080347L;
+    private static final long serialVersionUID = 8556768262688051982L;
 
     private UuidKey key;
 
@@ -67,12 +67,20 @@ public class ConsumingDetail implements Entity<UuidKey> {
      */
     private Integer returningQuantity;
 
+    /**
+     * 退回使用信息。
+     *
+     * @since 1.1.1
+     */
+    private String returningUsageInfo;
+
     public ConsumingDetail() {
     }
 
     public ConsumingDetail(
             UuidKey key, String toolCutterType, String device, Integer consumingQuantity, BigDecimal worth,
-            String consumingPerson, Date consumingDate, String remark, String toolCutterCode, Integer returningQuantity
+            String consumingPerson, Date consumingDate, String remark, String toolCutterCode, Integer returningQuantity,
+            String returningUsageInfo
     ) {
         this.key = key;
         this.toolCutterType = toolCutterType;
@@ -84,6 +92,7 @@ public class ConsumingDetail implements Entity<UuidKey> {
         this.remark = remark;
         this.toolCutterCode = toolCutterCode;
         this.returningQuantity = returningQuantity;
+        this.returningUsageInfo = returningUsageInfo;
     }
 
     @Override
@@ -168,6 +177,14 @@ public class ConsumingDetail implements Entity<UuidKey> {
         this.returningQuantity = returningQuantity;
     }
 
+    public String getReturningUsageInfo() {
+        return returningUsageInfo;
+    }
+
+    public void setReturningUsageInfo(String returningUsageInfo) {
+        this.returningUsageInfo = returningUsageInfo;
+    }
+
     @Override
     public String toString() {
         return "ConsumingDetail{" +
@@ -181,6 +198,7 @@ public class ConsumingDetail implements Entity<UuidKey> {
                 ", remark='" + remark + '\'' +
                 ", toolCutterCode='" + toolCutterCode + '\'' +
                 ", returningQuantity=" + returningQuantity +
+                ", returningUsageInfo='" + returningUsageInfo + '\'' +
                 '}';
     }
 }

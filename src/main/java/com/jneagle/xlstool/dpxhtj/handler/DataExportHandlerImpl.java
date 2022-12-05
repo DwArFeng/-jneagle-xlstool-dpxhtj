@@ -73,6 +73,12 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     private int personPerspectiveStatisticsDateColumnIndex;
     @Value("${data_export.data_sheet.person_perspective.column_index.tool_cutter_code}")
     private int personPerspectiveToolCutterCodeColumnIndex;
+    @Value("${data_export.data_sheet.person_perspective.column_index.returning_usage_g01_quantity}")
+    private int returningUsageG01QuantityColumnIndex;
+    @Value("${data_export.data_sheet.person_perspective.column_index.returning_usage_g02_quantity}")
+    private int returningUsageG02QuantityColumnIndex;
+    @Value("${data_export.data_sheet.person_perspective.column_index.returning_usage_g03_quantity}")
+    private int returningUsageG03QuantityColumnIndex;
 
     @Value("${data_export.data_sheet.device_perspective.first_data_row}")
     private int devicePerspectiveFirstDataRow;
@@ -300,6 +306,27 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             cell.setCellValue(Optional.ofNullable(personPerspective.getToolCutterCode()).orElse(""));
             cell.setCellStyle(cellStyle(
                     styleMap, personPerspectiveToolCutterCodeColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
+
+            // 退回使用等级01数量。
+            cell = CellUtil.getCell(row, returningUsageG01QuantityColumnIndex);
+            cell.setCellValue(Optional.ofNullable(personPerspective.getReturningUsageG01Quantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, returningUsageG01QuantityColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
+
+            // 退回使用等级02数量。
+            cell = CellUtil.getCell(row, returningUsageG02QuantityColumnIndex);
+            cell.setCellValue(Optional.ofNullable(personPerspective.getReturningUsageG02Quantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, returningUsageG02QuantityColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
+
+            // 退回使用等级03数量。
+            cell = CellUtil.getCell(row, returningUsageG03QuantityColumnIndex);
+            cell.setCellValue(Optional.ofNullable(personPerspective.getReturningUsageG03Quantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, returningUsageG03QuantityColumnIndex, sheet, personPerspectiveFirstDataRow
             ));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +

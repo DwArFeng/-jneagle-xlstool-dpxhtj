@@ -12,7 +12,7 @@
     <!-- 设置配置文件的路径 -->
     <context:property-placeholder
             location="classpath:xlstool/*.properties,classpath:data-import/*.properties,
-            classpath:data-export/*.properties"
+            classpath:data-export/*.properties,classpath:statistics/*.properties"
             local-override="true"
             properties-ref="refProperties"
     />
@@ -27,6 +27,8 @@
                 <value>file:conf/data-import/*.properties</value>
                 <!--suppress SpringXmlModelInspection -->
                 <value>file:conf/data-export/*.properties</value>
+                <!--suppress SpringXmlModelInspection -->
+                <value>file:conf/data-analyse/*.properties</value>
             </list>
         </property>
     </bean>
