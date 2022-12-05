@@ -151,25 +151,31 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             String statisticsDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             // 遍历人员透视。
             Sheet personPerspectiveSheet = workbook.getSheetAt(personPerspectiveSheetIndex);
+            Map<Integer, CellStyle> personPerspectiveStyleMap = new HashMap<>();
             for (int i = 0; i < personPerspectives.size(); i++) {
                 exportSinglePersonPerspective(
-                        personPerspectiveSheet, i, statisticsDate, personPerspectives.get(i), exportErrorInfos
+                        personPerspectiveSheet, i, statisticsDate, personPerspectives.get(i), exportErrorInfos,
+                        personPerspectiveStyleMap
                 );
                 fireProgressChanged(++progress, total);
             }
             // 遍历设备透视。
             Sheet devicePerspectiveSheet = workbook.getSheetAt(devicePerspectiveSheetIndex);
+            Map<Integer, CellStyle> devicePerspectiveStyleMap = new HashMap<>();
             for (int i = 0; i < devicePerspectives.size(); i++) {
                 exportSingleDevicePerspective(
-                        devicePerspectiveSheet, i, statisticsDate, devicePerspectives.get(i), exportErrorInfos
+                        devicePerspectiveSheet, i, statisticsDate, devicePerspectives.get(i), exportErrorInfos,
+                        devicePerspectiveStyleMap
                 );
                 fireProgressChanged(++progress, total);
             }
             // 遍历刀片透视。
             Sheet toolCutterPerspectiveSheet = workbook.getSheetAt(toolCutterPerspectiveSheetIndex);
+            Map<Integer, CellStyle> toolCutterPerspectiveStyleMap = new HashMap<>();
             for (int i = 0; i < toolCutterPerspectives.size(); i++) {
                 exportSingleToolCutterPerspective(
-                        toolCutterPerspectiveSheet, i, statisticsDate, toolCutterPerspectives.get(i), exportErrorInfos
+                        toolCutterPerspectiveSheet, i, statisticsDate, toolCutterPerspectives.get(i), exportErrorInfos,
+                        toolCutterPerspectiveStyleMap
                 );
                 fireProgressChanged(++progress, total);
             }
@@ -219,7 +225,7 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     @SuppressWarnings("DuplicatedCode")
     private void exportSinglePersonPerspective(
             Sheet sheet, int index, String statisticsDate, PersonPerspective personPerspective,
-            List<ExportErrorInfo> exportErrorInfos
+            List<ExportErrorInfo> exportErrorInfos, Map<Integer, CellStyle> styleMap
     ) {
         // 定义通用变量。
         int rowIndex = personPerspectiveFirstDataRow + index;
@@ -229,42 +235,72 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             // 月份。
             cell = CellUtil.getCell(row, personPerspectiveMonthColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getMonth()).map(i -> monthArray[i]).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveMonthColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 姓名。
             cell = CellUtil.getCell(row, personPerspectiveNameColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getName()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveNameColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 刀片型号。
             cell = CellUtil.getCell(row, personPerspectiveToolCutterTypeColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getToolCutterType()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveToolCutterTypeColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 消耗数量。
             cell = CellUtil.getCell(row, personPerspectiveConsumingQuantityColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getConsumingQuantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveConsumingQuantityColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 价值。
             cell = CellUtil.getCell(row, personPerspectiveWorthColumnIndex);
             cell.setCellValue(OptionalDouble.of(personPerspective.getWorth().doubleValue()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveWorthColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 返回数量。
             cell = CellUtil.getCell(row, personPerspectiveReturningQuantityColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getReturningQuantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveReturningQuantityColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 设备。
             cell = CellUtil.getCell(row, personPerspectiveDeviceColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getDevice()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveDeviceColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 年份。
             cell = CellUtil.getCell(row, personPerspectiveYearColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getYear()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveYearColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 统计日期。
             cell = CellUtil.getCell(row, personPerspectiveStatisticsDateColumnIndex);
             cell.setCellValue(statisticsDate);
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveStatisticsDateColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
 
             // 刀片代号。
             cell = CellUtil.getCell(row, personPerspectiveToolCutterCodeColumnIndex);
             cell.setCellValue(Optional.ofNullable(personPerspective.getToolCutterCode()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, personPerspectiveToolCutterCodeColumnIndex, sheet, personPerspectiveFirstDataRow
+            ));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +
                     (rowIndex + 1) + " 行)数据时出现异常，异常信息为: ";
@@ -279,7 +315,7 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     @SuppressWarnings("DuplicatedCode")
     private void exportSingleDevicePerspective(
             Sheet sheet, int index, String statisticsDate, DevicePerspective devicePerspective,
-            List<ExportErrorInfo> exportErrorInfos
+            List<ExportErrorInfo> exportErrorInfos, Map<Integer, CellStyle> styleMap
     ) {
         // 定义通用变量。
         int rowIndex = devicePerspectiveFirstDataRow + index;
@@ -289,34 +325,58 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             // 月份。
             cell = CellUtil.getCell(row, devicePerspectiveMonthColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getMonth()).map(i -> monthArray[i]).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveMonthColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 设备。
             cell = CellUtil.getCell(row, devicePerspectiveDeviceColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getDevice()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveDeviceColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 刀片型号。
             cell = CellUtil.getCell(row, devicePerspectiveToolCutterTypeColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getToolCutterType()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveToolCutterTypeColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 消耗数量。
             cell = CellUtil.getCell(row, devicePerspectiveConsumingQuantityColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getConsumingQuantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveConsumingQuantityColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 价值。
             cell = CellUtil.getCell(row, devicePerspectiveWorthColumnIndex);
             cell.setCellValue(OptionalDouble.of(devicePerspective.getWorth().doubleValue()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveWorthColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 年份。
             cell = CellUtil.getCell(row, devicePerspectiveYearColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getYear()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveYearColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 统计日期。
             cell = CellUtil.getCell(row, devicePerspectiveStatisticsDateColumnIndex);
             cell.setCellValue(statisticsDate);
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveStatisticsDateColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
 
             // 刀片代号。
             cell = CellUtil.getCell(row, devicePerspectiveToolCutterCodeColumnIndex);
             cell.setCellValue(Optional.ofNullable(devicePerspective.getToolCutterCode()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, devicePerspectiveToolCutterCodeColumnIndex, sheet, devicePerspectiveFirstDataRow
+            ));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +
                     (rowIndex + 1) + " 行)数据时出现异常，异常信息为: ";
@@ -331,7 +391,7 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
     @SuppressWarnings("DuplicatedCode")
     private void exportSingleToolCutterPerspective(
             Sheet sheet, int index, String statisticsDate, ToolCutterPerspective toolCutterPerspective,
-            List<ExportErrorInfo> exportErrorInfos
+            List<ExportErrorInfo> exportErrorInfos, Map<Integer, CellStyle> styleMap
     ) {
         // 定义通用变量。
         int rowIndex = toolCutterPerspectiveFirstDataRow + index;
@@ -341,30 +401,52 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             // 月份。
             cell = CellUtil.getCell(row, toolCutterPerspectiveMonthColumnIndex);
             cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getMonth()).map(i -> monthArray[i]).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveMonthColumnIndex, sheet, toolCutterPerspectiveFirstDataRow
+            ));
 
             // 刀片型号。
             cell = CellUtil.getCell(row, toolCutterPerspectiveToolCutterTypeColumnIndex);
             cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getToolCutterType()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveToolCutterTypeColumnIndex, sheet, toolCutterPerspectiveFirstDataRow
+            ));
 
             // 消耗数量。
             cell = CellUtil.getCell(row, toolCutterPerspectiveConsumingQuantityColumnIndex);
             cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getConsumingQuantity()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveConsumingQuantityColumnIndex, sheet,
+                    toolCutterPerspectiveFirstDataRow
+            ));
 
             // 价值。
             cell = CellUtil.getCell(row, toolCutterPerspectiveWorthColumnIndex);
             cell.setCellValue(OptionalDouble.of(toolCutterPerspective.getWorth().doubleValue()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveWorthColumnIndex, sheet, toolCutterPerspectiveFirstDataRow
+            ));
 
             // 年份。
             cell = CellUtil.getCell(row, toolCutterPerspectiveYearColumnIndex);
             cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getYear()).orElse(0));
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveYearColumnIndex, sheet, toolCutterPerspectiveFirstDataRow
+            ));
 
             // 统计日期。
             cell = CellUtil.getCell(row, toolCutterPerspectiveStatisticsDateColumnIndex);
             cell.setCellValue(statisticsDate);
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveStatisticsDateColumnIndex, sheet, toolCutterPerspectiveFirstDataRow
+            ));
 
             // 刀片代号。
             cell = CellUtil.getCell(row, toolCutterPerspectiveToolCutterCodeColumnIndex);
             cell.setCellValue(Optional.ofNullable(toolCutterPerspective.getToolCutterCode()).orElse(""));
+            cell.setCellStyle(cellStyle(
+                    styleMap, toolCutterPerspectiveToolCutterCodeColumnIndex, sheet, toolCutterPerspectiveFirstDataRow
+            ));
         } catch (Exception e) {
             String warnMessage = "设置数据表的第 " + rowIndex + " 行(对应数据表是第 " +
                     (rowIndex + 1) + " 行)数据时出现异常，异常信息为: ";
@@ -374,6 +456,17 @@ public class DataExportHandlerImpl extends AbstractProgressHandler implements Da
             );
             exportErrorInfos.add(exportErrorInfo);
         }
+    }
+
+    private CellStyle cellStyle(Map<Integer, CellStyle> styleMap, int columnIndex, Sheet sheet, int refRowIndex) {
+        if (styleMap.containsKey(columnIndex)) {
+            return styleMap.get(columnIndex);
+        }
+        Row row = CellUtil.getRow(refRowIndex, sheet);
+        Cell cell = CellUtil.getCell(row, columnIndex);
+        CellStyle cellStyle = cell.getCellStyle();
+        styleMap.put(columnIndex, cellStyle);
+        return cellStyle;
     }
 
     private void saveWorkbook(Workbook workbook, File file, int fileType, String password) throws Exception {
