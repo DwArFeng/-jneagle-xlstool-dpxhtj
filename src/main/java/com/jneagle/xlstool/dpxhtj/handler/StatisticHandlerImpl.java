@@ -113,11 +113,9 @@ public class StatisticHandlerImpl extends AbstractProgressHandler implements Sta
         if (Objects.nonNull(returningUsageInfo)) {
             if (returningUsageInfo.matches(returningUsageG01Regex)) {
                 returningUsageG01Quantity = returningQuantity;
-            }
-            if (returningUsageInfo.matches(returningUsageG02Regex)) {
+            } else if (returningUsageInfo.matches(returningUsageG02Regex)) {
                 returningUsageG02Quantity = returningQuantity;
-            }
-            if (returningUsageInfo.matches(returningUsageG03Regex)) {
+            } else if (returningUsageInfo.matches(returningUsageG03Regex)) {
                 returningUsageG03Quantity = returningQuantity;
             }
         }
